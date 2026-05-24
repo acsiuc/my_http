@@ -1,6 +1,5 @@
-def main():
-    print("Hello from my-http!")
+from my_http.server import server_init
 
 
 if __name__ == "__main__":
-    main()
+    server_init()
