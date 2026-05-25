@@ -7,6 +7,5 @@ def hello():
 
 dictionary_of_paths = {"/hello": hello}
 
-
 if __name__ == "__main__":
     server_init(dictionary_of_paths)
