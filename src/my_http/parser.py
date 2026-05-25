@@ -14,7 +14,10 @@ def parse(unparsed_data: bytes) -> Request:
     method = request[0]
     path = request[1]
     headers = request_and_headers[1:]
-    body = split_data[1]
+    try:
+        body = split_data[1]
+    except IndexError:
+        body = ""
     object_to_return = Request(method, path, headers, body)
 
     return object_to_return
