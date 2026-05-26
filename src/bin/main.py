@@ -2,7 +2,7 @@ from my_http.server import server_init
 
 
 def get_hello():
-    return "I just wanna fuck."
+    return "Hello world."
 
 
 dictionary_of_paths = {"/hello": {"GET": get_hello}}

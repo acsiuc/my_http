@@ -11,7 +11,9 @@ def server_init(dictionary_of_paths: dict):
 
     while True:
         connection_socket, address = my_socket.accept()
-        unparsed_data = connection_socket.recv(1024)
+        unparsed_data = b""
+        while b"\r\n\r\n" not in unparsed_data:
+            unparsed_data += connection_socket.recv(1024)
         parsed_data = parse(unparsed_data)
         routed_content = router(parsed_data, dictionary_of_paths)
         connection_socket.send(response(routed_content))
