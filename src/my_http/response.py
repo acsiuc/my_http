@@ -1,8 +1,15 @@
-def response(routed_content: str) -> bytes:
-    status_line = "HTTP/1.1 200 OK\r\n"
-    header = f"Content-Length: {len(routed_content)}"
-    body = f"\r\n\r\n{routed_content}"
+class Response:
+    def __init__(self, status_line, headers: list, body: str):
+        self.status_line = status_line
+        self.headers = headers
+        self.body = body
 
-    http_response = status_line + header + body
+
+def response(response: Response) -> bytes:
+    status_line = response.status_line + "\r\n"
+    headers = "\r\n".join(response.headers)
+    body = "\r\n\r\n" + response.body
+
+    http_response = status_line + headers + body
 
     return http_response.encode()
