@@ -16,15 +16,30 @@ def get_hello() -> Response:
     return Response(status_line, headers, body)
 
 
-def get_time():
-    return str(datetime.datetime.now())
+def get_time() -> Response:
+    status_line = "HTTP/1.1 200 OK"
+    body = str(datetime.datetime.now)
+    headers = [
+        f"Date: {datetime.datetime.now()}",
+        "Content-Type: text",
+        f"Content-Length: {len(body)}",
+    ]
+
+    return Response(status_line, headers, body)
 
 
-def get_html():
+def get_html() -> Response:
+    status_line = "HTTP/1.1 200 OK"
     current_path = Path(__file__)
     html_file_content = current_path.parent.parent.parent / "html_files/index.html"
     with open(html_file_content, "r") as file:
-        return file.read()
+        body = file.read()
+    headers = [
+        f"Date: {datetime.datetime.now()}",
+        "Content-Type: text/html",
+        f"Content-Length: {len(body)}",
+    ]
+    return Response(status_line, headers, body)
 
 
 dictionary_of_paths = {
