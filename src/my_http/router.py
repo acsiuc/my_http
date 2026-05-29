@@ -8,7 +8,7 @@ import mimetypes
 def router(request: Request, dictionary_of_paths: dict) -> Response:
     current_path = Path(__file__)
     path = current_path.parent.parent.parent / f"html_files{request.path}"
-    path_exists = Path.exists(path)
+    path_exists = Path.is_file(path)
     if request.path in dictionary_of_paths:
         methods_dictionary = dictionary_of_paths[request.path]
     elif path_exists:
@@ -26,7 +26,7 @@ def router(request: Request, dictionary_of_paths: dict) -> Response:
         return Response("HTTP/1.1 404 Not Found", [], "Error 404. Not Found")
 
     if request.method in methods_dictionary:
-        response = methods_dictionary[request.method]()
+        response = methods_dictionary[request.method](request)
     else:
         return Response(
             "HTTP/1.1 405 Method Not Allowed", [], "Error 405. Method Not Allowed"
