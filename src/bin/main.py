@@ -2,10 +2,12 @@ from my_http.server import server_init
 from pathlib import Path
 from my_http.response import Response
 from my_http.parser import Request
+from my_http.router import dictionary_of_paths, route
 import urllib.parse
 import datetime
 
 
+@route("/hello", "GET")
 def get_hello(request: Request) -> Response:
     status_line = "HTTP/1.1 200 OK"
     body = "Hello World"
@@ -18,6 +20,7 @@ def get_hello(request: Request) -> Response:
     return Response(status_line, headers, body)
 
 
+@route("/time", "GET")
 def get_time(request: Request) -> Response:
     status_line = "HTTP/1.1 200 OK"
     body = str(datetime.datetime.now())
@@ -30,6 +33,7 @@ def get_time(request: Request) -> Response:
     return Response(status_line, headers, body)
 
 
+@route("/html", "GET")
 def get_html(request: Request) -> Response:
     status_line = "HTTP/1.1 200 OK"
     current_path = Path(__file__)
@@ -44,6 +48,7 @@ def get_html(request: Request) -> Response:
     return Response(status_line, headers, body)
 
 
+@route("/login", "GET")
 def get_login(request: Request) -> Response:
     status_line = "HTTP/1.1 200 OK"
     current_path = Path(__file__)
@@ -58,6 +63,7 @@ def get_login(request: Request) -> Response:
     return Response(status_line, headers, body)
 
 
+@route("/login", "POST")
 def post_login(request: Request) -> Response:
     status_line = "HTTP/1.1 200 OK"
     body = str(urllib.parse.parse_qs(request.body))
@@ -69,13 +75,6 @@ def post_login(request: Request) -> Response:
 
     return Response(status_line, headers, body)
 
-
-dictionary_of_paths = {
-    "/hello": {"GET": get_hello},
-    "/time": {"GET": get_time},
-    "/html": {"GET": get_html},
-    "/login": {"GET": get_login, "POST": post_login},
-}
 
 if __name__ == "__main__":
     server_init(dictionary_of_paths)

@@ -4,6 +4,19 @@ from pathlib import Path
 import datetime
 import mimetypes
 
+dictionary_of_paths = {}
+
+
+def route(path, method):
+    def write_to_dict(func):
+        if path not in dictionary_of_paths:
+            dictionary_of_paths[path] = {method: func}
+        else:
+            dictionary_of_paths[path][method] = func
+        return func
+
+    return write_to_dict
+
 
 def router(request: Request, dictionary_of_paths: dict) -> Response:
     current_path = Path(__file__)
