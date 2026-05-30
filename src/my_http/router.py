@@ -1,24 +1,29 @@
-from .parser import Request
-from my_http.response import Response
-from pathlib import Path
+from dataclasses import dataclass, field
 import datetime
 import mimetypes
+from pathlib import Path
+from typing import Callable
 
-dictionary_of_paths = {}
+from my_http.response import Response
 
-
-def route(path, method):
-    def write_to_dict(func):
-        if path not in dictionary_of_paths:
-            dictionary_of_paths[path] = {method: func}
-        else:
-            dictionary_of_paths[path][method] = func
-        return func
-
-    return write_to_dict
+from .parser import Request
 
 
-def router(request: Request, dictionary_of_paths: dict) -> Response:
+@dataclass
+class App:
+    dictionary_of_paths: dict[str, Callable] = field(default_factory=dict)
+
+    def route(self, path, method):
+        def write_to_dict(func):
+            if path not in self.dictionary_of_paths:
+                self.dictionary_of_paths[path] = {method: func}
+            else:
+                self.dictionary_of_paths[path][method] = func
+            return func
+        return write_to_dict
+
+
+def router(request: Request, dictionary_of_paths: dict[str, Callable]) -> Response:
     current_path = Path(__file__)
     path = current_path.parent.parent.parent / f"html_files{request.path}"
     path_exists = Path.is_file(path)

@@ -1,7 +1,6 @@
 import socket
 from .parser import parse
 from .router import router
-from .response import response
 
 
 def server_init(dictionary_of_paths: dict):
@@ -27,6 +26,8 @@ def server_init(dictionary_of_paths: dict):
                         parsed_data.body += connection_socket.recv(body_length).decode()
         else:
             parsed_data.body = ""
-        routed_content = router(parsed_data, dictionary_of_paths)
-        connection_socket.send(response(routed_content))
+        method_result = router(parsed_data, dictionary_of_paths)
+        # TODO: based on the returned value create appropriate response
+
+        connection_socket.send(method_result.encode())
         connection_socket.close()
