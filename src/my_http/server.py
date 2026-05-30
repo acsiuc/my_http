@@ -14,7 +14,11 @@ def server_init(dictionary_of_paths: dict):
         unparsed_data = b""
         while b"\r\n\r\n" not in unparsed_data:
             unparsed_data += connection_socket.recv(1024)
-        parsed_data = parse(unparsed_data)
+        if len(unparsed_data) != 0:
+            parsed_data = parse(unparsed_data)
+        else:
+            connection_socket.close()
+            continue
         if "Content-Length" in "".join(parsed_data.headers):
             for x in parsed_data.headers:
                 if "Content-Length" in x:
