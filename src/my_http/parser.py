@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import json
 
 
 @dataclass
@@ -30,3 +31,6 @@ class Request:
         obj = cls(method, path, headers, body)
 
         return obj
+
+    def json(self):
+        return json.loads(self.body)

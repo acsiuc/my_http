@@ -1,80 +1,51 @@
 from my_http.server import server_init
 from pathlib import Path
-from my_http.response import Response
 from my_http.parser import Request
-from my_http.router import dictionary_of_paths, route
-import urllib.parse
+from my_http.response import Response
+from my_http.router import App
+import uuid
 import datetime
 
+app = App()
 
-@route("/hello", "GET")
-def get_hello(request: Request) -> Response:
-    status_line = "HTTP/1.1 200 OK"
-    body = "Hello World"
-    headers = [
-        f"Date: {datetime.datetime.now()}",
-        "Content-Type: text",
-        f"Content-Length: {len(body)}",
-    ]
-
-    return Response(status_line, headers, body)
+users = {}
 
 
-@route("/time", "GET")
-def get_time(request: Request) -> Response:
-    status_line = "HTTP/1.1 200 OK"
-    body = str(datetime.datetime.now())
-    headers = [
-        f"Date: {datetime.datetime.now()}",
-        "Content-Type: text",
-        f"Content-Length: {len(body)}",
-    ]
-
-    return Response(status_line, headers, body)
+@app.route("/hello", "GET")
+def get_hello(request: Request) -> str:
+    return "Hello World"
 
 
-@route("/html", "GET")
-def get_html(request: Request) -> Response:
-    status_line = "HTTP/1.1 200 OK"
+@app.route("/time", "GET")
+def get_time(request: Request) -> str:
+    return str(datetime.datetime.now())
+
+
+@app.route("/html", "GET")
+def get_html(request: Request) -> dict:
     current_path = Path(__file__)
     html_file_content = current_path.parent.parent.parent / "html_files/index.html"
     with open(html_file_content, "r") as file:
         body = file.read()
-    headers = [
-        f"Date: {datetime.datetime.now()}",
-        "Content-Type: text/html",
-        f"Content-Length: {len(body)}",
-    ]
-    return Response(status_line, headers, body)
+    return body
 
 
-@route("/login", "GET")
-def get_login(request: Request) -> Response:
-    status_line = "HTTP/1.1 200 OK"
+@app.route("/login", "GET")
+def get_login(request: Request) -> dict:
     current_path = Path(__file__)
     html_file_content = current_path.parent.parent.parent / "html_files/login.html"
     with open(html_file_content, "r") as file:
         body = file.read()
-    headers = [
-        f"Date: {datetime.datetime.now()}",
-        "Content-Type: text/html",
-        f"Content-Length: {len(body)}",
-    ]
-    return Response(status_line, headers, body)
+    return body
 
 
-@route("/login", "POST")
-def post_login(request: Request) -> Response:
-    status_line = "HTTP/1.1 200 OK"
-    body = str(urllib.parse.parse_qs(request.body))
-    headers = [
-        f"Date: {datetime.datetime.now()}",
-        "Content-Type: text/html",
-        f"Content-Length: {len(body)}",
-    ]
-
-    return Response(status_line, headers, body)
+@app.route("/users", "POST")
+def post_users(request: Request) -> Response:
+    user = request.json()
+    new_user_id = str(uuid.uuid4())
+    users[new_user_id] = user
+    return str(new_user_id)
 
 
 if __name__ == "__main__":
-    server_init(dictionary_of_paths)
+    server_init(app)

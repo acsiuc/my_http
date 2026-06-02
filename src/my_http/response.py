@@ -38,7 +38,7 @@ class NotAllowed(StatusCode):
 
 @dataclass
 class Response:
-    status: StatusCode = field(default_factory=OK)
+    status: StatusCode = field(default=OK())
     headers: dict = field(default_factory=dict)
     body: dict | str = field(default="")
 
