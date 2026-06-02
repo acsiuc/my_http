@@ -29,6 +29,14 @@ class NotFound(StatusCode):
 
 
 @dataclass
+class NotAllowed(StatusCode):
+    code: int = 405
+
+    def phrase(self) -> str:
+        return "Method Not Allowed"
+
+
+@dataclass
 class Response:
     status: StatusCode = field(default_factory=OK)
     headers: dict = field(default_factory=dict)
