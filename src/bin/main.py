@@ -47,5 +47,15 @@ def delete_user(request: Request) -> Response:
         return Response(status=NotFound())
 
 
+@app.route("/users/{idx:str}", "PUT")
+def put_user(request: Request) -> Response:
+    if request.path_params["idx"] in users:
+        users[request.path_params["idx"]] = request.json()
+    else:
+        return Response(status=NotFound())
+
+    return Response(body=users[request.path_params["idx"]])
+
+
 if __name__ == "__main__":
     server_init(app)
