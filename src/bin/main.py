@@ -7,6 +7,7 @@ import uuid
 import datetime
 
 app = App()
+app.static_folder = Path(__file__).parent.parent.parent / "html_files"
 
 users = {}
 
@@ -21,24 +22,6 @@ def get_time(request: Request) -> str:
     return str(datetime.datetime.now())
 
 
-@app.route("/html", "GET")
-def get_html(request: Request) -> dict:
-    current_path = Path(__file__)
-    html_file_content = current_path.parent.parent.parent / "html_files/index.html"
-    with open(html_file_content, "r") as file:
-        body = file.read()
-    return body
-
-
-@app.route("/login", "GET")
-def get_login(request: Request) -> dict:
-    current_path = Path(__file__)
-    html_file_content = current_path.parent.parent.parent / "html_files/login.html"
-    with open(html_file_content, "r") as file:
-        body = file.read()
-    return Response(body=body, headers={"Content-Type": "text/html"})
-
-
 @app.route("/users/{idx:str}", "GET")
 def get_user(request: Request) -> Response:
     user = users.get(request.path_params["idx"])
@@ -48,7 +31,7 @@ def get_user(request: Request) -> Response:
 
 
 @app.route("/users", "POST")
-def post_users(request: Request) -> Response:
+def signup(request: Request) -> Response:
     user = request.json()
     new_user_id = str(uuid.uuid4())
     users[new_user_id] = user

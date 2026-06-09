@@ -8,7 +8,7 @@ from pathlib import Path
 @dataclass
 class App:
     dictionary_of_paths: dict[str, dict[str, Callable]] = field(default_factory=dict)
-    static_file: str = field(default=None)
+    static_folder: str = field(default=None)
 
     TYPE_MAP = {
         "int": int,
@@ -26,15 +26,17 @@ class App:
         return write_to_dict
 
     def send_static_file(self, filename):
-        if not self.static_file:
+        if not self.static_folder:
             raise RuntimeError("static_files must be set")
-        with open(Path(self.static_file) / filename, "r") as f:
+        with open(Path(self.static_folder) / filename.lstrip("/"), "r") as f:
             body = f.read()
-        return Response(body=body)
+        return Response(body=body, headers={"Content-Type": "text/html"})
 
     def router(self, request: Request) -> Response:
-        if self.static_file:
-            path_exists = Path.is_file(Path(self.static_file) / request.path)
+        if self.static_folder:
+            path_exists = Path.is_file(
+                Path(self.static_folder) / request.path.lstrip("/")
+            )
         else:
             path_exists = False
         methods_dictionary = {}
