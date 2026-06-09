@@ -8,6 +8,7 @@ class Request:
     path: str = field(default="")
     headers: list = field(default_factory=list)
     body: str = field(default="")
+    path_params: dict = field(default_factory=dict)
 
     @classmethod
     def parse(cls, unparsed_data: bytes) -> Request:

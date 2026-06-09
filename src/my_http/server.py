@@ -14,7 +14,7 @@ def server_init(app: App):
         while b"\r\n\r\n" not in unparsed_data:
             unparsed_data += connection_socket.recv(1024)
         if len(unparsed_data) != 0:
-            parsed_data = Request.encode(unparsed_data)
+            parsed_data = Request.parse(unparsed_data)
         else:
             connection_socket.close()
             continue

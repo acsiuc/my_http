@@ -10,6 +10,11 @@ class App:
     dictionary_of_paths: dict[str, dict[str, Callable]] = field(default_factory=dict)
     static_file: str = field(default=None)
 
+    TYPE_MAP = {
+        "int": int,
+        "str": str,
+    }
+
     def route(self, path, method):
         def write_to_dict(func):
             if path not in self.dictionary_of_paths:
@@ -28,20 +33,51 @@ class App:
         return Response(body=body)
 
     def router(self, request: Request) -> Response:
-        path_exists = Path.is_file(Path(self.static_file) / request.path)
-
-        if request.path in self.dictionary_of_paths:
-            methods_dictionary = self.dictionary_of_paths[request.path]
-        elif path_exists:
-            return self.send_static_file(request.path)
+        if self.static_file:
+            path_exists = Path.is_file(Path(self.static_file) / request.path)
         else:
-            return Response(status=NotFound(), body="Error 404. Not Found")
+            path_exists = False
+        methods_dictionary = {}
 
-        if request.method in methods_dictionary:
-            response = methods_dictionary[request.method](request)
-            if isinstance(response, Response):
-                return response
+        for path in self.dictionary_of_paths:
+            if path == request.path:
+                methods_dictionary = self.dictionary_of_paths[path]
+            elif len(path.split("/")) == len(request.path.split("/")):
+                to_match = path.split("/")
+                for i in range(len(path.split("/"))):
+                    if (
+                        not to_match[i] == request.path.split("/")[i]
+                        and "{" not in to_match[i]
+                    ):
+                        break
+                    elif (
+                        "{" in to_match[i]
+                        and to_match[i].strip("{}").split(":")[1] in self.TYPE_MAP
+                    ):
+                        try:
+                            request.path_params[
+                                to_match[i].strip("{}").split(":")[0]
+                            ] = self.TYPE_MAP[to_match[i].strip("{}").split(":")[1]](
+                                request.path.split("/")[i]
+                            )
+                        except ValueError:
+                            break
+                else:
+                    methods_dictionary = self.dictionary_of_paths[path]
+
+        if not methods_dictionary:
+            if path_exists:
+                return self.send_static_file(request.path)
             else:
-                return Response(body=response)
-        else:
-            return Response(status=NotAllowed(), body="Error 405. Method Not Allowed")
+                return Response(status=NotFound(), body="Error 404. Not Found")
+        elif methods_dictionary:
+            if request.method in methods_dictionary:
+                response = methods_dictionary[request.method](request)
+                if isinstance(response, Response):
+                    return response
+                else:
+                    return Response(body=response)
+            else:
+                return Response(
+                    status=NotAllowed(), body="Error 405. Method Not Allowed"
+                )
