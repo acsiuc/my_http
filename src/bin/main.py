@@ -31,11 +31,20 @@ def get_user(request: Request) -> Response:
 
 
 @app.route("/users", "POST")
-def signup(request: Request) -> Response:
+def post_signup(request: Request) -> Response:
     user = request.json()
     new_user_id = str(uuid.uuid4())
     users[new_user_id] = user
     return str(new_user_id)
+
+
+@app.route("/users/{idx:str}", "DELETE")
+def delete_user(request: Request) -> Response:
+    if request.path_params["idx"] in users:
+        del users[request.path_params["idx"]]
+        return Response(body="User deleted succesfully.")
+    else:
+        return Response(status=NotFound())
 
 
 if __name__ == "__main__":
