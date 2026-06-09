@@ -1,7 +1,7 @@
 from my_http.server import server_init
 from pathlib import Path
 from my_http.parser import Request
-from my_http.response import Response
+from my_http.response import Response, NotFound
 from my_http.router import App
 import uuid
 import datetime
@@ -36,7 +36,15 @@ def get_login(request: Request) -> dict:
     html_file_content = current_path.parent.parent.parent / "html_files/login.html"
     with open(html_file_content, "r") as file:
         body = file.read()
-    return body
+    return Response(body=body, headers={"Content-Type": "text/html"})
+
+
+@app.route("/users/{idx:str}", "GET")
+def get_user(request: Request) -> Response:
+    user = users.get(request.path_params["idx"])
+    if user is None:
+        return Response(status=NotFound())
+    return user
 
 
 @app.route("/users", "POST")
