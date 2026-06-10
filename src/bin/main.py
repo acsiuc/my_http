@@ -23,7 +23,7 @@ def get_time(request: Request) -> str:
 
 
 @app.route("/users/{idx:str}", "GET")
-def get_user(request: Request) -> Response:
+def get_users(request: Request) -> Response:
     user = users.get(request.path_params["idx"])
     if user is None:
         return Response(status=NotFound())
@@ -31,7 +31,7 @@ def get_user(request: Request) -> Response:
 
 
 @app.route("/users", "POST")
-def post_signup(request: Request) -> Response:
+def post_users(request: Request) -> Response:
     user = request.json()
     new_user_id = str(uuid.uuid4())
     users[new_user_id] = user
@@ -39,7 +39,7 @@ def post_signup(request: Request) -> Response:
 
 
 @app.route("/users/{idx:str}", "DELETE")
-def delete_user(request: Request) -> Response:
+def delete_users(request: Request) -> Response:
     if request.path_params["idx"] in users:
         del users[request.path_params["idx"]]
         return Response(body="User deleted succesfully.")
@@ -48,13 +48,27 @@ def delete_user(request: Request) -> Response:
 
 
 @app.route("/users/{idx:str}", "PUT")
-def put_user(request: Request) -> Response:
-    if request.path_params["idx"] in users:
-        users[request.path_params["idx"]] = request.json()
+def put_users(request: Request) -> Response:
+    user_id = request.path_params["idx"]
+    if user_id in users:
+        users[user_id] = request.json()
     else:
         return Response(status=NotFound())
 
-    return Response(body=users[request.path_params["idx"]])
+    return Response(body=users[user_id])
+
+
+@app.route("/users/{idx:str}", "PATCH")
+def patch_users(request: Request) -> Response:
+    user_id = request.path_params["idx"]
+    if user_id in users:
+        payload = request.json()
+        for key in payload:
+            if key in user_id:
+                users[user_id][key] = payload[key]
+    else:
+        return Response(status=NotFound())
+    return Response(body=users[user_id])
 
 
 if __name__ == "__main__":
