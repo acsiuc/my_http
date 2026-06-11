@@ -64,8 +64,7 @@ def patch_users(request: Request) -> Response:
     if user_id in users:
         payload = request.json()
         for key in payload:
-            if key in user_id:
-                users[user_id][key] = payload[key]
+            users[user_id][key] = payload[key]
     else:
         return Response(status=NotFound())
     return Response(body=users[user_id])
