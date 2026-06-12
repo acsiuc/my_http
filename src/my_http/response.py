@@ -37,6 +37,22 @@ class NotAllowed(StatusCode):
 
 
 @dataclass
+class Unauthorized(StatusCode):
+    code: int = 401
+
+    def phrase(self) -> str:
+        return "Unauthorized"
+
+
+@dataclass
+class Forbidden(StatusCode):
+    code: int = 403
+
+    def phrase(self) -> str:
+        return "Forbidden"
+
+
+@dataclass
 class Response:
     status: StatusCode = field(default_factory=OK)
     headers: dict = field(default_factory=dict)
