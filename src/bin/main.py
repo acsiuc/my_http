@@ -3,6 +3,7 @@ from pathlib import Path
 from my_http.parser import Request
 from my_http.response import Response, NotFound
 from my_http.router import App
+import jwt
 import uuid
 import datetime
 
@@ -20,6 +21,21 @@ def get_hello(request: Request) -> str:
 @app.route("/time", "GET")
 def get_time(request: Request) -> str:
     return str(datetime.datetime.now())
+
+
+@app.route("/login", "POST")
+def post_login(request: Request) -> Response:
+    body = request.json()
+    for idx in users:
+        if (
+            body["password"] == users[idx]["password"]
+            and body["username"] == users[idx]["username"]
+        ):
+            authorization_token = jwt.encode(
+                {"user_id": idx}, "secret", algorithm="HS256"
+            )
+            return Response(body=authorization_token)
+    return Response(body=body)
 
 
 @app.route("/users/{idx:str}", "GET")
