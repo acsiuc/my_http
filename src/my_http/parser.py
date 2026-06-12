@@ -30,7 +30,7 @@ class Request:
         headers = {}
         for header in auxiliary_headers:
             header_and_content = header.split(":", 1)
-            headers[header_and_content[0]] = header_and_content[1]
+            headers[header_and_content[0]] = header_and_content[1].lstrip()
 
         body = split_data[1]
 
