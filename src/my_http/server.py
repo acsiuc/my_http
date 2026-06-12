@@ -18,12 +18,10 @@ def server_init(app: App):
         else:
             connection_socket.close()
             continue
-        if "Content-Length" in "".join(parsed_data.headers):
-            for x in parsed_data.headers:
-                if "Content-Length" in x:
-                    body_length = int(x.split(":")[1].strip())
-                    while len(parsed_data.body) < body_length:
-                        parsed_data.body += connection_socket.recv(body_length).decode()
+        if "Content-Length" in parsed_data.headers:
+            body_length = int(parsed_data.headers["Content-Length"])
+            while len(parsed_data.body) < body_length:
+                parsed_data.body += connection_socket.recv(body_length).decode()
         else:
             parsed_data.body = ""
         method_content = app.router(parsed_data)
