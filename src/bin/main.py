@@ -25,7 +25,13 @@ def get_time(request: Request) -> str:
 
 @app.route("/login", "POST")
 def post_login(request: Request) -> Response:
-    body = request.json()
+    body = {}
+    username_field = request.body.split("&")[0]
+    password_field = request.body.split("&")[1]
+    username = username_field.split("=")
+    password = password_field.split("=")
+    body[username[0]] = username[1]
+    body[password[0]] = password[1]
     for idx in users:
         if (
             body["password"] == users[idx]["password"]
