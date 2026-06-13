@@ -1,7 +1,7 @@
 from my_http.server import server_init
 from pathlib import Path
 from my_http.parser import Request
-from my_http.response import Response, NotFound, Unauthorized
+from my_http.response import Response, NotFound, Unauthorized, Forbidden
 from my_http.router import App
 import jwt
 import uuid
@@ -56,18 +56,19 @@ def post_users(request: Request) -> Response:
 
 @app.route("/users/{idx:str}", "DELETE")
 def delete_users(request: Request) -> Response:
+    user_id = request.path_params["idx"]
     if "Authorization" in request.headers:
         encoded_jwt = request.headers["Authorization"].split(" ")[1]
         try:
-            jwt.decode(encoded_jwt, "secret", algorithms=["HS256"])
+            decoded_jwt = jwt.decode(encoded_jwt, "secret", algorithms=["HS256"])
         except jwt.exceptions.InvalidTokenError:
             return Response(status=Unauthorized())
 
-        if request.path_params["idx"] in users:
+        if user_id in users and decoded_jwt["user_id"] == user_id:
             del users[request.path_params["idx"]]
             return Response(body="User deleted succesfully.")
         else:
-            return Response(status=NotFound())
+            return Response(status=Forbidden())
     else:
         return Response(status=Unauthorized())
 
