@@ -53,6 +53,14 @@ class Forbidden(StatusCode):
 
 
 @dataclass
+class NoContent(StatusCode):
+    code: int = 204
+
+    def phrase(self) -> str:
+        return "No Content"
+
+
+@dataclass
 class Response:
     status: StatusCode = field(default_factory=OK)
     headers: dict = field(default_factory=dict)
