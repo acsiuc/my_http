@@ -67,13 +67,18 @@ class App:
                 else:
                     methods_dictionary = self.dictionary_of_paths[path]
 
-        if not methods_dictionary:
-            if path_exists:
-                return self.send_static_file(request.path)
-            else:
-                return Response(status=NotFound(), body="Error 404. Not Found")
-        elif methods_dictionary:
-            if request.method in methods_dictionary:
+        if methods_dictionary:
+            if request.method == "HEAD":
+                if "GET" in methods_dictionary:
+                    response = methods_dictionary["GET"](request)
+                    print(response.body)
+                    response.headers["Content-Length"] = len(response.body)
+                    response.body = ""
+                    print(response.body)
+                    return response
+                else:
+                    return Response(status=NotAllowed())
+            elif request.method in methods_dictionary:
                 response = methods_dictionary[request.method](request)
                 if isinstance(response, Response):
                     return response
@@ -83,3 +88,8 @@ class App:
                 return Response(
                     status=NotAllowed(), body="Error 405. Method Not Allowed"
                 )
+        elif not methods_dictionary:
+            if path_exists:
+                return self.send_static_file(request.path)
+            else:
+                return Response(status=NotFound(), body="Error 404. Not Found")

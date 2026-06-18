@@ -72,7 +72,8 @@ class Response:
             body = self.body
         if "Content-Type" not in self.headers:
             self.headers["Content-Type"] = "text/plain"
-        self.headers["Content-Length"] = len(body)
+        if "Content-Type" not in self.headers:
+            self.headers["Content-Length"] = len(body)
         self.headers["Date"] = datetime.datetime.now(timezone.utc).strftime(
             "%a, %d %b %Y %H:%M:%S GMT"
         )

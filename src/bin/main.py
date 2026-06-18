@@ -15,12 +15,12 @@ users = {}
 
 @app.route("/hello", "GET")
 def get_hello(request: Request) -> str:
-    return "Hello World"
+    return Response(body="Hello World")
 
 
 @app.route("/time", "GET")
 def get_time(request: Request) -> str:
-    return str(datetime.datetime.now())
+    return Response(body=str(datetime.datetime.now()))
 
 
 @app.route("/login", "POST")
