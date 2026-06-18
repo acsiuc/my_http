@@ -1,5 +1,5 @@
 from .parser import Request
-from my_http.response import Response, NotFound, NotAllowed
+from my_http.response import Response, NotFound, NotAllowed, NoContent
 from typing import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -68,6 +68,13 @@ class App:
                     methods_dictionary = self.dictionary_of_paths[path]
 
         if methods_dictionary:
+            if request.method == "OPTIONS":
+                options_headers = {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, GET, OPTIONS, DELETE, PUT, PATCH, HEAD",
+                    "Access-Control-Allow-Headers": "Authorization",
+                }
+                return Response(status=NoContent(), headers=options_headers)
             if request.method == "HEAD":
                 if "GET" in methods_dictionary:
                     response = methods_dictionary["GET"](request)
@@ -78,7 +85,7 @@ class App:
                     return response
                 else:
                     return Response(status=NotAllowed())
-            elif request.method in methods_dictionary:
+            if request.method in methods_dictionary:
                 response = methods_dictionary[request.method](request)
                 if isinstance(response, Response):
                     return response
