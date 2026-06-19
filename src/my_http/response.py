@@ -1,15 +1,17 @@
 from dataclasses import dataclass, field
 from datetime import timezone
+from abc import ABC, abstractmethod
 import datetime
 import json
 
 
 @dataclass
-class StatusCode:
+class StatusCode(ABC):
     code: int
 
+    @abstractmethod
     def phrase(self) -> str:
-        return "Message"
+        pass
 
 
 @dataclass
@@ -80,7 +82,8 @@ class Response:
             body = self.body
         if "Content-Type" not in self.headers:
             self.headers["Content-Type"] = "text/plain"
-        if "Content-Type" not in self.headers:
+        print(body)
+        if "Content-Length" not in self.headers:
             self.headers["Content-Length"] = len(body)
         self.headers["Date"] = datetime.datetime.now(timezone.utc).strftime(
             "%a, %d %b %Y %H:%M:%S GMT"
