@@ -7,7 +7,7 @@ class Request:
     method: str
     path: str = field(default="")
     headers: dict = field(default_factory=dict)
-    body: str = field(default="")
+    body: dict | str = field(default="")
     path_params: dict = field(default_factory=dict)
 
     @classmethod
@@ -37,6 +37,21 @@ class Request:
         obj = cls(method, path, headers, body)
 
         return obj
+
+    def parse_by_type(self):
+        headers = self.headers
+        body = self.body
+        if "Content-Type" in headers:
+            if headers["Content-Type"] == "application/json":
+                self.body = json.loads(body)
+            elif headers["Content-Type"] == "application/x-www-form-urlencoded":
+                key_value_pairs = body.split("&")
+                body = {}
+                for pair in key_value_pairs:
+                    key = pair.split("=")[0]
+                    value = pair.split("=")[1]
+                    body[key] = value
+                self.body = body
 
     def json(self):
         return json.loads(self.body)

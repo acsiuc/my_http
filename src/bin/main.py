@@ -25,13 +25,7 @@ def get_time(request: Request) -> str:
 
 @app.route("/login", "POST")
 def post_login(request: Request) -> Response:
-    body = {}
-    username_field = request.body.split("&")[0]
-    password_field = request.body.split("&")[1]
-    username = username_field.split("=")
-    password = password_field.split("=")
-    body[username[0]] = username[1]
-    body[password[0]] = password[1]
+    body = request.body
     for idx in users:
         if (
             body["password"] == users[idx]["password"]
@@ -54,7 +48,7 @@ def get_users(request: Request) -> Response:
 
 @app.route("/users", "POST")
 def post_users(request: Request) -> Response:
-    user = request.json()
+    user = request.body
     new_user_id = str(uuid.uuid4())
     users[new_user_id] = user
     return str(new_user_id)
@@ -83,7 +77,7 @@ def delete_users(request: Request) -> Response:
 def put_users(request: Request) -> Response:
     user_id = request.path_params["idx"]
     if user_id in users:
-        users[user_id] = request.json()
+        users[user_id] = request.body
     else:
         return Response(status=NotFound())
 
@@ -94,7 +88,7 @@ def put_users(request: Request) -> Response:
 def patch_users(request: Request) -> Response:
     user_id = request.path_params["idx"]
     if user_id in users:
-        payload = request.json()
+        payload = request.body()
         for key in payload:
             users[user_id][key] = payload[key]
     else:

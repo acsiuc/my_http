@@ -24,6 +24,7 @@ def server_init(app: App):
                 parsed_data.body += connection_socket.recv(body_length).decode()
         else:
             parsed_data.body = ""
+        parsed_data.parse_by_type()
         method_content = app.router(parsed_data)
         connection_socket.send(method_content.encode())
         connection_socket.close()
