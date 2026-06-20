@@ -34,7 +34,8 @@ def post_login(request: Request) -> Response:
             authorization_token = jwt.encode(
                 {"user_id": idx}, "secret", algorithm="HS256"
             )
-            return Response(body=authorization_token)
+            response_headers = {"Set-Cookie": "session=" + authorization_token}
+            return Response(headers=response_headers)
     return Response(body=body)
 
 
