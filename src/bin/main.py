@@ -9,6 +9,8 @@ import datetime
 
 app = App()
 app.static_folder = Path(__file__).parent.parent.parent / "html_files"
+certificate = Path(__file__).parent.parent.parent / "cert.pem"
+private_key = Path(__file__).parent.parent.parent / "key.pem"
 
 users = {}
 
@@ -98,4 +100,4 @@ def patch_users(request: Request) -> Response:
 
 
 if __name__ == "__main__":
-    server_init(app)
+    server_init(app, certificate, private_key)

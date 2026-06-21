@@ -1,12 +1,19 @@
 import socket
 from .parser import Request
 from .router import App
+import ssl
 
 
-def server_init(app: App):
+def server_init(
+    app: App, certificate: str | None = None, private_key: str | None = None
+):
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     my_socket.bind(("", 8080))
     my_socket.listen(5)
+    if certificate is not None and private_key is not None:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(certificate, private_key)
+        my_socket = context.wrap_socket(my_socket, server_side=True)
 
     while True:
         connection_socket, address = my_socket.accept()
